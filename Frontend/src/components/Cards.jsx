@@ -33,10 +33,49 @@ const Card = ({ title, unit, value = "--" }) => (
 
 const Cards = ({ vitals }) => {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4 w-full">
-      {vitals.map((vital, index) => (
-        <Card key={index} title={vital.title} unit={vital.unit} value={vital.value} />
-      ))}
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      {vitals.map((vital, index) => {
+        // Convert value to number if it's not already
+        const numValue = parseFloat(vital.value);
+        let isAbnormal = false;
+
+        // Determine if the value is abnormal
+        switch (vital.title) {
+          case "Heart Rate":
+            isAbnormal = numValue < 60 || numValue > 100;
+            break;
+          case "Resting Heart Rate":
+            isAbnormal = numValue < 60 || numValue > 80;
+            break;
+          case "Blood Oxygen":
+            isAbnormal = numValue < 95;
+            break;
+          case "Blood Pressure":
+            isAbnormal = vital.value !== "120/80";
+            break;
+          case "Temperature":
+            isAbnormal = numValue < 36 || numValue > 37.5;
+            break;
+          case "Sleep Monitoring":
+            isAbnormal = numValue < 6 || numValue > 9;
+            break;
+          default:
+            break;
+        }
+
+        return (
+          <div
+            key={index}
+            className={`p-4 rounded-lg shadow-md transition duration-300 ${
+              isAbnormal ? "bg-red-500 text-white" : "bg-white"
+            }`}
+          >
+            <h3 className="text-xl font-bold">{vital.title}</h3>
+            <p className="text-2xl">{vital.value || "--"} {vital.unit}</p>
+            <p className="text-gray-700">{vital.normalRange}</p>
+          </div>
+        );
+      })}
     </div>
   );
 };
